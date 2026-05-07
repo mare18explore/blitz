@@ -1,0 +1,197 @@
+.stats-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.stats-header {
+  margin-bottom: 36px;
+}
+
+.stats-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #3b82f6;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.stats-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #f0f0f0;
+  letter-spacing: -0.5px;
+}
+
+.stats-title span {
+  color: #3b82f6;
+}
+
+/* tabs */
+.stats-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.stats-tab {
+  padding: 7px 18px;
+  border-radius: 8px;
+  border: 1px solid #1e1e2e;
+  background: transparent;
+  color: #888888;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.stats-tab:hover {
+  color: #f0f0f0;
+  background: #1e1e2e;
+}
+
+.stats-tab.active {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* search */
+.stats-search {
+  display: block;
+  width: 240px;
+  padding: 9px 14px;
+  margin-bottom: 24px;
+  background: #13131a;
+  border: 1px solid #1e1e2e;
+  border-radius: 8px;
+  color: #f0f0f0;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.stats-search::placeholder {
+  color: #555555;
+}
+
+.stats-search:focus {
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+/* table card — same look as .division-card in Standings */
+.stats-card {
+  background: #13131a;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #1e1e2e;
+  overflow-x: auto;
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 560px;
+}
+
+.stats-table thead tr {
+  background: #0d0d0f;
+  border-bottom: 1px solid #1e1e2e;
+}
+
+.stats-table th {
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #555555;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.stats-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.stats-table th.sortable:hover {
+  color: #888888;
+}
+
+.stats-table th.sorted {
+  color: #3b82f6;
+}
+
+.sort-arrow {
+  margin-left: 4px;
+  font-size: 10px;
+}
+
+/* align stat columns right so numbers line up */
+.col-num  { width: 40px; text-align: center; }
+.col-team { width: 60px; }
+.col-stat { text-align: right; }
+
+.stats-table td {
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #aaaaaa;
+  border-bottom: 1px solid #0d0d0f;
+}
+
+.stats-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.stats-table tbody tr:hover td {
+  background: #1a1a2e;
+}
+
+/* same first-place treatment as Standings */
+.stats-table tbody tr.first-place .player-name {
+  color: #ffffff;
+}
+
+.player-name {
+  font-weight: 600;
+  color: #e0e0e0;
+  white-space: nowrap;
+}
+
+.no-results {
+  text-align: center;
+  color: #555555;
+  padding: 48px 16px;
+}
+
+/* reuse the same status-msg + loading-pulse from index.css / Standings */
+.status-msg {
+  text-align: center;
+  padding: 80px;
+  color: #555555;
+  font-size: 15px;
+}
+.jersey-num {
+  font-size: 11px;
+  font-weight: 500;
+  color: #555555;
+  margin-left: 4px;
+}
+
+.loading-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
