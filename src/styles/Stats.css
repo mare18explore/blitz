@@ -186,6 +186,31 @@
   color: #555555;
   margin-left: 4px;
 }
+.season-select-wrap {
+	margin-bottom: 20px;
+}
+
+.season-select {
+	padding: 7px 14px;
+	border-radius: 8px;
+	border: 1px solid #1e1e2e;
+	background: #13131a;
+	color: #f0f0f0;
+	font-size: 13px;
+	font-family: inherit;
+	cursor: pointer;
+	outline: none;
+	transition: border-color 0.2s;
+}
+
+.season-select:focus {
+	border-color: rgba(59, 130, 246, 0.4);
+}
+
+.season-select option {
+	background: #13131a;
+	color: #f0f0f0;
+}
 
 .loading-pulse {
   animation: pulse 1.5s ease-in-out infinite;

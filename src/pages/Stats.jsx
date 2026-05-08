@@ -28,6 +28,14 @@ const NFL_TEAMS = {
 	'33': 'BAL', '34': 'HOU'
 }
 
+// seasons available to pick from 
+const currentYear = (new Date().getFullYear()) -1
+const SEASONS = Array.from(
+  { length: currentYear - 2002 + 1 },
+  (_, i) => currentYear - i  // starts from current year and counts down
+)
+
+
 function Stats() {
 	const [players, setPlayers] = useState([])
 	const [activeTab, setActiveTab] = useState('QB')
@@ -36,10 +44,12 @@ function Stats() {
 	const [sortKey, setSortKey] = useState('YDS')
 	const [sortDir, setSortDir] = useState('desc')
 	const [search, setSearch] = useState('')
+	const [season, setSeason] = useState(2025) // defaults to current season
 
+	// re-fetch whenever season changes
 	useEffect(() => {
 		fetchPlayers()
-	}, [])
+	}, [season])
 
 	async function fetchPlayers() {
 		setLoading(true)
@@ -47,9 +57,9 @@ function Stats() {
 		setPlayers([])
 
 		try {
-			// step 1: get stat leaders
+			// step 1: get stat leaders — season is now dynamic based on dropdown
 			const leadersRes = await fetch(
-				'/api/espn/v2/sports/football/leagues/nfl/seasons/2025/types/2/leaders'
+				`/api/espn/v2/sports/football/leagues/nfl/seasons/${season}/types/2/leaders`
 			)
 			/* leadersData is a JS obj, categories is an array of objects and each obj has 2 strings to denote 
 				the name of the category and the abbreviation, 
@@ -113,8 +123,8 @@ function Stats() {
 			}).filter(p => p.name !== '—') // drop any whose detail fetch failed
 
 			setPlayers(parsed)
-      const qbs = parsed.filter(p => p.position === 'QB')
-      console.log('QB stats sample:', JSON.stringify(qbs[0]?.stats, null, 2))
+			const qbs = parsed.filter(p => p.position === 'QB')
+			console.log('QB stats sample:', JSON.stringify(qbs[0]?.stats, null, 2))
 		} catch (err) {
 			console.error(err)
 			setError('Failed to load player stats')
@@ -153,8 +163,25 @@ function Stats() {
 		<div className="stats-container">
 
 			<div className="stats-header">
-				<p className="stats-label">2025 Season</p>
+				<p className="stats-label">{season} Season</p>
 				<h2 className="stats-title">Player <span>Stats</span></h2>
+			</div>
+
+			{/* season dropdown — defaults to 2025, refetches when changed */}
+			<div className="season-select-wrap">
+				<select
+					className="season-select"
+					value={season}
+					onChange={e => {
+						setSeason(Number(e.target.value))
+						setSearch('')
+						setSortKey('YDS')
+					}}
+				>
+					{SEASONS.map(yr => (
+						<option key={yr} value={yr}>{yr} Season</option>
+					))}
+				</select>
 			</div>
 
 			<div className="stats-tabs">
