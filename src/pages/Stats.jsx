@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import '../styles/Stats.css'
+import { useNavigate } from 'react-router-dom'
 
 const TABS = [
 	{ label: 'QB', position: 'QB' },
@@ -45,7 +46,8 @@ function Stats() {
 	const [sortDir, setSortDir] = useState('desc')
 	const [search, setSearch] = useState('')
 	const [season, setSeason] = useState(2025) // defaults to current season
-
+  // makes rows/player rows clickable
+  const navigate = useNavigate()
 	// re-fetch whenever season changes
 	useEffect(() => {
 		fetchPlayers()
@@ -235,7 +237,12 @@ function Stats() {
 						</thead>
 						<tbody>
 							{visible.map((p, i) => (
-								<tr key={p.id} className={i === 0 ? 'first-place' : ''}>
+								<tr
+                  key={p.id}
+                  className={i === 0 ? 'first-place' : ''}
+                  onClick={() => navigate(`/player/${p.id}`)}
+                  style={{ cursor: 'pointer' }}
+                >
 									<td className="col-num">{i + 1}</td>
 									<td className="col-player player-name">
 										{p.name} <span className="jersey-num">#{p.number}</span>
