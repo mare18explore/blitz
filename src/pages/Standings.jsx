@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import '../styles/Standings.css'
 
 // generate every season from 2002 up to the current year
@@ -14,7 +15,13 @@ function Standings() {
   const [standings, setStandings] = useState([])  // starts as empty array
   const [loading, setLoading] = useState(true)    // starts as true because we are loading
   const [error, setError] = useState(null)        // starts as null because no error yet
-  const [season, setSeason] = useState(currentYear) // defaults to current season
+  // functionality to allow url it fall back 
+  const { season: seasonParam } = useParams()
+  // seasonParam because season is already used as state below
+  const [season, setSeason] = useState(seasonParam ? Number(seasonParam) : currentYear)
+  //allows us to click on a team
+  const navigate = useNavigate()  
+  
 
   /*  useEffect runs after the component first appears on screen
   the [season] means: re-run this whenever the selected season changes */
@@ -63,7 +70,11 @@ function Standings() {
         <select
           className="season-select"
           value={season}
-          onChange={e => setSeason(Number(e.target.value))}
+          onChange={e => {
+            const yr = Number(e.target.value)
+            setSeason(yr)
+            navigate(`/standings/${yr}`)
+          }}
         >
           {SEASONS.map(yr => (
             <option key={yr} value={yr}>{yr} Season</option>
@@ -116,6 +127,12 @@ function Standings() {
                   <div
                     key={entry.team.id}
                     className={`team-row ${index === 0 ? 'first-place' : ''}`}
+                    onClick={() => {
+                      const record = entry.stats.find(s => s.name === 'wins')?.displayValue + '-' + 
+                        entry.stats.find(s => s.name === 'losses')?.displayValue
+                      navigate(`/team/${entry.team.id}/${season}/${record}`)
+                    }}
+                    style={{ cursor: 'pointer' }}
                   >
                     <span className="team-rank">{index + 1}</span>
                     <img

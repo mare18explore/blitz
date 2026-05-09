@@ -1,0 +1,228 @@
+.team-container {
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 40px 24px;
+}
+
+/* back button — same as player page */
+.back-btn {
+	background: transparent;
+	border: 1px solid #1e1e2e;
+	color: #888888;
+	padding: 8px 16px;
+	border-radius: 8px;
+	font-size: 13px;
+	font-family: inherit;
+	cursor: pointer;
+	margin-bottom: 32px;
+	transition: all 0.2s;
+}
+
+.back-btn:hover {
+	color: #f0f0f0;
+	border-color: #3b82f6;
+}
+
+/* team header card */
+.team-card {
+	display: flex;
+	gap: 36px;
+	align-items: center;
+	background: #13131a;
+	border: 1px solid #1e1e2e;
+	border-radius: 16px;
+	padding: 32px;
+	margin-bottom: 36px;
+	border-left-width: 4px;
+}
+
+.team-logo-large {
+	width: 120px;
+	height: 120px;
+	object-fit: contain;
+}
+
+.team-card-right {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.team-name-large {
+	font-size: 36px;
+	font-weight: 800;
+	color: #f0f0f0;
+	letter-spacing: -0.5px;
+	line-height: 1.1;
+}
+
+.team-season-label {
+	font-size: 13px;
+	color: #555555;
+	font-weight: 500;
+}
+
+.team-record-wrap {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	margin-top: 4px;
+}
+
+.team-record {
+	font-size: 28px;
+	font-weight: 800;
+	color: #f0f0f0;
+}
+
+.team-record-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: #555555;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+/* game log */
+.gamelog-wrap {
+	margin-bottom: 48px;
+}
+
+.section-label {
+	font-size: 11px;
+	font-weight: 600;
+	color: #3b82f6;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+	margin-bottom: 16px;
+}
+
+.gamelog-card {
+	background: #13131a;
+	border: 1px solid #1e1e2e;
+	border-radius: 12px;
+	overflow: hidden;
+	overflow-x: auto;
+}
+
+.gamelog-table {
+	width: 100%;
+	border-collapse: collapse;
+	min-width: 500px;
+}
+
+.gamelog-table thead tr {
+	background: #0d0d0f;
+	border-bottom: 1px solid #1e1e2e;
+}
+
+.gamelog-table th {
+	padding: 12px 16px;
+	font-size: 11px;
+	font-weight: 600;
+	color: #555555;
+	text-transform: uppercase;
+	letter-spacing: 1.5px;
+	text-align: left;
+	white-space: nowrap;
+}
+
+.gamelog-table td {
+	padding: 12px 16px;
+	font-size: 13px;
+	font-weight: 500;
+	color: #aaaaaa;
+	border-bottom: 1px solid #0d0d0f;
+}
+
+.gamelog-table tbody tr:last-child td {
+	border-bottom: none;
+}
+
+.gamelog-table tbody tr:hover td {
+	background: #1a1a2e;
+}
+
+/* opponent cell */
+.opponent-col {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.opp-logo {
+	width: 24px;
+	height: 24px;
+	object-fit: contain;
+	flex-shrink: 0;
+}
+
+/* win/loss row tinting */
+.win-row td {
+	background: rgba(34, 197, 94, 0.04);
+}
+
+.loss-row td {
+	background: rgba(239, 68, 68, 0.04);
+}
+
+.win-row:hover td {
+	background: rgba(34, 197, 94, 0.08) !important;
+}
+
+.loss-row:hover td {
+	background: rgba(239, 68, 68, 0.08) !important;
+}
+
+/* result column */
+.result-col {
+	font-weight: 700;
+}
+
+.result-col.win {
+	color: #22c55e;
+}
+
+.result-col.loss {
+	color: #ef4444;
+}
+
+/* misc columns */
+.week-col {
+	color: #555555;
+	font-weight: 600;
+	width: 50px;
+}
+
+.date-col {
+	white-space: nowrap;
+	width: 80px;
+}
+
+.score-col {
+	font-weight: 600;
+	color: #e0e0e0;
+}
+
+.no-results {
+	text-align: center;
+	color: #555555;
+	padding: 48px 16px;
+}
+
+/* loading */
+.status-msg {
+	text-align: center;
+	padding: 80px;
+	color: #555555;
+	font-size: 15px;
+}
+
+.loading-pulse {
+	animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+	0%, 100% { opacity: 1; }
+	50%       { opacity: 0.4; }
+}
