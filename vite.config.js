@@ -9,6 +9,11 @@ export default defineConfig({
         target: 'https://sports.core.api.espn.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/espn/, '')
+      },
+      '/api/gemini': {
+        target: 'https://generativelanguage.googleapis.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/gemini/, '')
       }
     }
   }

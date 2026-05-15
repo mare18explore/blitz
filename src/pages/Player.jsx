@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import '../styles/Player.css'
 
 // which stat categories to show per position — filters out irrelevant stats
+// spent way too long figuring out ESPN returns everything for everyone
 const POSITION_CATEGORIES = {
 	QB:  ['passing', 'rushing'],
 	RB:  ['rushing', 'receiving'],
@@ -19,6 +20,7 @@ const POSITION_CATEGORIES = {
 }
 
 // key stats to display per position — current season boxes and career table columns
+// trimmed down from the massive ESPN response
 const KEY_STATS = {
 	QB:  ['YDS', 'TD', 'INT', 'CMP', 'CMP%', 'ATT', 'RTG'],
 	RB:  ['YDS', 'TD', 'CAR', 'AVG', 'REC', 'RECYDS'],
@@ -41,9 +43,20 @@ function Player() {
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState(null)
 
+	// chat stuff
+	const [messages, setMessages] = useState([])
+	const [input, setInput] = useState('')
+	const [chatLoading, setChatLoading] = useState(false)
+	const chatEndRef = useRef(null) // so we can scroll to the bottom after each message
+
 	useEffect(() => {
 		fetchPlayerData()
 	}, [id]) // re-fetch if the id in the URL changes
+
+	// auto scroll chat to bottom whenever a new message comes in
+	useEffect(() => {
+		chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+	}, [messages])
 
 	async function fetchPlayerData() {
 		setLoading(true)
@@ -70,6 +83,7 @@ function Player() {
 
 			// each entry has a season $ref and a statistics $ref — extract the year from the season URL
 			// and fetch the actual stats from the total statistics $ref for each season in parallel
+			// doing them all in parallel so it doesn't take forever
 			const seasonFetches = entries.map(entry => {
 				const yearMatch = entry.season?.$ref?.match(/seasons\/(\d+)/)
 				const year = yearMatch?.[1]
@@ -78,7 +92,7 @@ function Player() {
 
 				const statsUrl = statsRef
 					.replace('https://sports.core.api.espn.com', '/api/espn')
-					.replace(/\?.*$/, '')
+					.replace(/\?.*$/, '') // strip the query params we dont need
 
 				return fetch(statsUrl)
 					.then(r => r.json())
@@ -103,6 +117,62 @@ function Player() {
 			setError('Failed to load player data')
 		} finally {
 			setLoading(false)
+		}
+	}
+
+	async function sendMessage() {
+		if (!input.trim() || chatLoading) return
+
+		// build a context string with everything we know about this player
+		// this gets sent to Claude so it can answer questions accurately
+		const playerContext = `
+			You are a knowledgeable NFL analyst assistant. You have access to the following player's data:
+			Name: ${name}
+			Position: ${position}
+			Age: ${age}
+			Height: ${height}
+			Weight: ${weight}
+			Experience: ${experience} years
+			College: ${college}
+			Career Stats by Season:
+			${careerStats.map(s => {
+				const statMap = {}
+				s.categories?.forEach(cat => cat.stats?.forEach(stat => {
+					statMap[stat.abbreviation] = stat.displayValue
+				}))
+				return `${s.year}: ${Object.entries(statMap).map(([k, v]) => `${k}: ${v}`).join(', ')}`
+			}).join('\n')}
+
+			Answer questions about this player clearly and conversationally. You can compare them to other players from your training knowledge. Keep answers concise — 2-4 sentences unless more detail is asked for.
+		`
+
+		const userMessage = { role: 'user', content: input }
+		const updatedMessages = [...messages, userMessage]
+		setMessages(updatedMessages)
+		setInput('')
+		setChatLoading(true)
+
+		try {
+			const response = await fetch(
+        `/api/gemini/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              { role: 'user', parts: [{ text: playerContext + '\n\nUser: ' + input }] }
+            ]
+          })
+        }
+      )
+
+			const data = await response.json()
+			const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I could not generate a response.'
+			setMessages(prev => [...prev, { role: 'assistant', content: reply }])
+		} catch (err) {
+			setMessages(prev => [...prev, { role: 'assistant', content: 'Something went wrong. Try again.' }])
+		} finally {
+			setChatLoading(false)
 		}
 	}
 
@@ -162,28 +232,28 @@ function Player() {
 
 			{/* current season stats — only the key stats for this position */}
 			{currentSeason && (
-        <div className="current-season-wrap">
-          <p className="section-label">{currentSeasonYear} Season</p>
-          <div className="current-season-stats">
-            {(() => {
-              const seen = new Set()
-              return currentSeason.categories?.flatMap(cat =>
-                cat.stats?.filter(stat => {
-                  if (!keyStats.includes(stat.abbreviation)) return false
-                  if (seen.has(stat.abbreviation)) return false
-                  seen.add(stat.abbreviation)
-                  return true
-                }) || []
-              ).map(stat => (
-                <div key={stat.name} className="stat-block">
-                  <span className="stat-value">{stat.displayValue}</span>
-                  <span className="stat-name">{stat.abbreviation}</span>
-                </div>
-              ))
-            })()}
-          </div>
-        </div>
-      )}
+				<div className="current-season-wrap">
+					<p className="section-label">{currentSeasonYear} Season</p>
+					<div className="current-season-stats">
+						{(() => {
+							const seen = new Set()
+							return currentSeason.categories?.flatMap(cat =>
+								cat.stats?.filter(stat => {
+									if (!keyStats.includes(stat.abbreviation)) return false
+									if (seen.has(stat.abbreviation)) return false
+									seen.add(stat.abbreviation)
+									return true
+								}) || []
+							).map(stat => (
+								<div key={stat.name} className="stat-block">
+									<span className="stat-value">{stat.displayValue}</span>
+									<span className="stat-name">{stat.abbreviation}</span>
+								</div>
+							))
+						})()}
+					</div>
+				</div>
+			)}
 
 			{/* career stats table — one row per season, only key columns */}
 			{careerStats.length > 0 && (
@@ -225,6 +295,47 @@ function Player() {
 					</div>
 				</div>
 			)}
+
+			{/* AI chat — passes player bio + career stats as context so Claude can answer accurately */}
+			<div className="player-chat">
+				<p className="section-label">Ask about {name}</p>
+
+				<div className="chat-messages">
+					{messages.length === 0 && (
+						<p className="chat-placeholder">Ask anything — career stats, comparisons, predictions...</p>
+					)}
+					{messages.map((msg, i) => (
+						<div key={i} className={`chat-msg ${msg.role}`}>
+							<p>{msg.content}</p>
+						</div>
+					))}
+					{chatLoading && (
+						<div className="chat-msg assistant">
+							<p className="loading-pulse">Thinking...</p>
+						</div>
+					)}
+					<div ref={chatEndRef} />
+				</div>
+
+				<div className="chat-input-wrap">
+					<input
+						className="chat-input"
+						type="text"
+						placeholder={`Ask about ${name}...`}
+						value={input}
+						onChange={e => setInput(e.target.value)}
+						onKeyDown={e => e.key === 'Enter' && sendMessage()}
+					/>
+					<button
+						className="chat-send"
+						onClick={sendMessage}
+						disabled={chatLoading || !input.trim()}
+					>
+						{chatLoading ? '...' : 'Ask'}
+					</button>
+				</div>
+			</div>
+
 		</div>
 	)
 }

@@ -1,244 +1,355 @@
 .player-container {
-	max-width: 960px;
-	margin: 0 auto;
-	padding: 40px 24px;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px;
 }
 
 /* back button */
 .back-btn {
-	background: transparent;
-	border: 1px solid #1e1e2e;
-	color: #888888;
-	padding: 8px 16px;
-	border-radius: 8px;
-	font-size: 13px;
-	font-family: inherit;
-	cursor: pointer;
-	margin-bottom: 32px;
-	transition: all 0.2s;
+    background: transparent;
+    border: 1px solid #1e1e2e;
+    color: #888888;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    margin-bottom: 32px;
+    transition: all 0.2s;
 }
 
 .back-btn:hover {
-	color: #f0f0f0;
-	border-color: #3b82f6;
+    color: #f0f0f0;
+    border-color: #3b82f6;
 }
 
 /* top card */
 .player-card {
-	display: flex;
-	gap: 36px;
-	align-items: flex-start;
-	background: #13131a;
-	border: 1px solid #1e1e2e;
-	border-radius: 16px;
-	padding: 32px;
-	margin-bottom: 36px;
+    display: flex;
+    gap: 36px;
+    align-items: flex-start;
+    background: #13131a;
+    border: 1px solid #1e1e2e;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 36px;
 }
 
 /* headshot */
 .player-headshot-wrap {
-	flex-shrink: 0;
+    flex-shrink: 0;
 }
 
 .player-headshot {
-	width: 160px;
-	height: 160px;
-	object-fit: cover;
-	border-radius: 12px;
-	background: #0d0d0f;
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 12px;
+    background: #0d0d0f;
 }
 
 .player-headshot-placeholder {
-	width: 160px;
-	height: 160px;
-	border-radius: 12px;
-	background: #1e1e2e;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 48px;
-	color: #333355;
+    width: 160px;
+    height: 160px;
+    border-radius: 12px;
+    background: #1e1e2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: #333355;
 }
 
 /* bio */
 .player-bio {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .player-position-badge {
-	display: inline-block;
-	padding: 3px 10px;
-	border-radius: 999px;
-	background: rgba(59, 130, 246, 0.15);
-	color: #3b82f6;
-	border: 1px solid rgba(59, 130, 246, 0.3);
-	font-size: 11px;
-	font-weight: 700;
-	letter-spacing: 1px;
-	text-transform: uppercase;
-	width: fit-content;
-	margin-bottom: 4px;
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    width: fit-content;
+    margin-bottom: 4px;
 }
 
 .player-name-large {
-	font-size: 36px;
-	font-weight: 800;
-	color: #f0f0f0;
-	letter-spacing: -0.5px;
-	line-height: 1.1;
+    font-size: 36px;
+    font-weight: 800;
+    color: #f0f0f0;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
 }
 
 .player-jersey {
-	font-size: 15px;
-	font-weight: 600;
-	color: #555555;
+    font-size: 15px;
+    font-weight: 600;
+    color: #555555;
 }
 
 .player-details {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-	margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
 }
 
 .player-details span {
-	padding: 4px 12px;
-	background: #0d0d0f;
-	border: 1px solid #1e1e2e;
-	border-radius: 6px;
-	font-size: 12px;
-	color: #888888;
+    padding: 4px 12px;
+    background: #0d0d0f;
+    border: 1px solid #1e1e2e;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #888888;
 }
 
 /* current season stats */
 .current-season-wrap {
-	margin-bottom: 36px;
+    margin-bottom: 36px;
 }
 
 .section-label {
-	font-size: 11px;
-	font-weight: 600;
-	color: #3b82f6;
-	text-transform: uppercase;
-	letter-spacing: 2px;
-	margin-bottom: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #3b82f6;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
 }
 
 .current-season-stats {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 .stat-block {
-	background: #13131a;
-	border: 1px solid #1e1e2e;
-	border-radius: 12px;
-	padding: 20px 28px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 6px;
-	min-width: 100px;
+    background: #13131a;
+    border: 1px solid #1e1e2e;
+    border-radius: 12px;
+    padding: 20px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 100px;
 }
 
 .stat-value {
-	font-size: 32px;
-	font-weight: 800;
-	color: #f0f0f0;
-	letter-spacing: -1px;
+    font-size: 32px;
+    font-weight: 800;
+    color: #f0f0f0;
+    letter-spacing: -1px;
 }
 
 .stat-name {
-	font-size: 11px;
-	font-weight: 600;
-	color: #555555;
-	text-transform: uppercase;
-	letter-spacing: 1.5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #555555;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
 }
 
 /* career table */
 .career-wrap {
-	margin-bottom: 48px;
+    margin-bottom: 48px;
 }
 
 .career-table-wrap {
-	background: #13131a;
-	border: 1px solid #1e1e2e;
-	border-radius: 12px;
-	overflow: hidden;
-	overflow-x: auto;
+    background: #13131a;
+    border: 1px solid #1e1e2e;
+    border-radius: 12px;
+    overflow: hidden;
+    overflow-x: auto;
 }
 
 .career-table {
-	width: 100%;
-	border-collapse: collapse;
-	min-width: 400px;
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 400px;
 }
 
 .career-table thead tr {
-	background: #0d0d0f;
-	border-bottom: 1px solid #1e1e2e;
+    background: #0d0d0f;
+    border-bottom: 1px solid #1e1e2e;
 }
 
 .career-table th {
-	padding: 12px 16px;
-	font-size: 11px;
-	font-weight: 600;
-	color: #555555;
-	text-transform: uppercase;
-	letter-spacing: 1.5px;
-	text-align: left;
-	white-space: nowrap;
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #555555;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    text-align: left;
+    white-space: nowrap;
 }
 
 .career-table td {
-	padding: 12px 16px;
-	font-size: 13px;
-	font-weight: 500;
-	color: #aaaaaa;
-	border-bottom: 1px solid #0d0d0f;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #aaaaaa;
+    border-bottom: 1px solid #0d0d0f;
 }
 
 .career-table tbody tr:last-child td {
-	border-bottom: none;
+    border-bottom: none;
 }
 
 .career-table tbody tr:hover td {
-	background: #1a1a2e;
+    background: #1a1a2e;
 }
 
 /* current season row — bold and brighter to stand out */
 .current-season-row td {
-	color: #f0f0f0;
-	font-weight: 700;
-	background: rgba(59, 130, 246, 0.06);
+    color: #f0f0f0;
+    font-weight: 700;
+    background: rgba(59, 130, 246, 0.06);
 }
 
 .season-year {
-	font-weight: 700;
-	color: #e0e0e0;
+    font-weight: 700;
+    color: #e0e0e0;
 }
 
 .current-season-row .season-year {
-	color: #3b82f6;
+    color: #3b82f6;
 }
 
 /* reuse loading styles */
 .status-msg {
-	text-align: center;
-	padding: 80px;
-	color: #555555;
-	font-size: 15px;
+    text-align: center;
+    padding: 80px;
+    color: #555555;
+    font-size: 15px;
 }
 
 .loading-pulse {
-	animation: pulse 1.5s ease-in-out infinite;
+    animation: pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes pulse {
-	0%, 100% { opacity: 1; }
-	50%       { opacity: 0.4; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+}
+
+/* AI chat section — same card style as the rest of the page */
+.player-chat {
+    margin-top: 48px;
+    margin-bottom: 48px;
+}
+
+.chat-messages {
+    background: #13131a;
+    border: 1px solid #1e1e2e;
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 160px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.chat-placeholder {
+    color: #555555;
+    font-size: 13px;
+    text-align: center;
+    margin: auto;
+}
+
+/* user and assistant messages get different alignment */
+.chat-msg {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.chat-msg.user {
+    align-self: flex-end;
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #f0f0f0;
+}
+
+.chat-msg.assistant {
+    align-self: flex-start;
+    background: #0d0d0f;
+    border: 1px solid #1e1e2e;
+    color: #aaaaaa;
+}
+
+.chat-msg p {
+    margin: 0;
+}
+
+/* input row at the bottom */
+.chat-input-wrap {
+    display: flex;
+    gap: 8px;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 10px 14px;
+    background: #13131a;
+    border: 1px solid #1e1e2e;
+    border-radius: 8px;
+    color: #f0f0f0;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.chat-input::placeholder {
+    color: #555555;
+}
+
+.chat-input:focus {
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.chat-send {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.chat-send:hover {
+    background: #2563eb;
+}
+
+.chat-send:disabled {
+    background: #1e1e2e;
+    color: #555555;
+    cursor: not-allowed;
 }
