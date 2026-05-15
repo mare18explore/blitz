@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/espn/:path*",
+      "destination": "https://sports.core.api.espn.com/:path*"
+    },
+    {
+      "source": "/api/gemini/:path*",
+      "destination": "https://generativelanguage.googleapis.com/:path*"
+    }
+  ]
+}
