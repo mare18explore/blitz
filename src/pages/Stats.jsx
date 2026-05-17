@@ -92,8 +92,10 @@ function Stats() {
 					if (!statsMap[id]) statsMap[id] = {}
 					if (!athleteRefs[id]) {
 						// convert the full $ref URL to our proxied path, strip query params
-						athleteRefs[id] = ref.replace('https://sports.core.api.espn.com', '/api/espn')
-							.replace(/\?.*$/, '')
+						athleteRefs[id] = ref
+              .replace('https://sports.core.api.espn.com', '/api/espn')
+              .replace('http://sports.core.api.espn.com', '/api/espn')
+              .replace(/\?.*$/, '')
 					}
 					if (abbr && !statsMap[id][abbr]) statsMap[id][abbr] = entry.displayValue
 				})

@@ -8,5 +8,16 @@
       "source": "/api/gemini/:path*",
       "destination": "https://generativelanguage.googleapis.com/:path*"
     }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "X-Forwarded-Proto",
+          "value": "https"
+        }
+      ]
+    }
   ]
 }

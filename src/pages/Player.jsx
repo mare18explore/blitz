@@ -92,7 +92,8 @@ function Player() {
 
 				const statsUrl = statsRef
 					.replace('https://sports.core.api.espn.com', '/api/espn')
-					.replace(/\?.*$/, '') // strip the query params we dont need
+          .replace('http://sports.core.api.espn.com', '/api/espn')
+          .replace(/\?.*$/, '') // strip the query params we dont need
 
 				return fetch(statsUrl)
 					.then(r => r.json())
