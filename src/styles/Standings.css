@@ -217,3 +217,43 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
+
+/* mobile — kicks in on screens narrower than 640px */
+@media (max-width: 640px) {
+  .standings-container {
+    padding: 24px 16px;
+  }
+
+  .standings-title {
+    font-size: 24px;
+  }
+
+  /* stack the season dropdown full width on mobile */
+  .season-select {
+    width: 100%;
+  }
+
+  /* tighten up the team rows so they fit on a small screen */
+  .team-row {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .team-name {
+    font-size: 13px;
+  }
+
+  /* reduce gap between W L PCT so they dont overflow */
+  .team-stats {
+    gap: 12px;
+  }
+
+  .division-stats-header {
+    gap: 12px;
+  }
+
+  /* shrink the conference line so badge + line fit */
+  .conference-header {
+    gap: 8px;
+  }
+}

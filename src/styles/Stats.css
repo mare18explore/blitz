@@ -220,3 +220,50 @@
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.4; }
 }
+
+/* mobile — tables scroll horizontally, search goes full width */
+@media (max-width: 640px) {
+  .stats-container {
+    padding: 24px 16px;
+  }
+
+  .stats-title {
+    font-size: 24px;
+  }
+
+  /* tabs wrap onto two lines instead of overflowing */
+  .stats-tabs {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .stats-tab {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  /* search goes full width on mobile */
+  .stats-search {
+    width: 100%;
+  }
+
+  /* season select full width too */
+  .season-select {
+    width: 100%;
+  }
+
+  /* table scrolls horizontally — min-width keeps columns readable */
+  .stats-card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .stats-table td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .stats-table th {
+    padding: 10px 12px;
+  }
+}

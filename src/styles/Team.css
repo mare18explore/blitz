@@ -226,3 +226,45 @@
 	0%, 100% { opacity: 1; }
 	50%       { opacity: 0.4; }
 }
+/* mobile — stack logo above team info, game log scrolls horizontally */
+@media (max-width: 640px) {
+    .team-container {
+        padding: 24px 16px;
+    }
+
+    /* stack logo above name instead of side by side */
+    .team-card {
+        flex-direction: column;
+        gap: 16px;
+        padding: 20px;
+        align-items: flex-start;
+    }
+
+    .team-logo-large {
+        width: 80px;
+        height: 80px;
+    }
+
+    .team-name-large {
+        font-size: 26px;
+    }
+
+    .team-record {
+        font-size: 22px;
+    }
+
+    /* game log scrolls horizontally on small screens */
+    .gamelog-card {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .gamelog-table td {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    .gamelog-table th {
+        padding: 10px 12px;
+    }
+}

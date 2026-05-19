@@ -353,3 +353,60 @@
     color: #555555;
     cursor: not-allowed;
 }
+/* mobile — stack the headshot above the bio, shrink stat blocks */
+@media (max-width: 640px) {
+    .player-container {
+        padding: 24px 16px;
+    }
+
+    /* stack headshot above bio instead of side by side */
+    .player-card {
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .player-headshot {
+        width: 120px;
+        height: 120px;
+    }
+
+    .player-headshot-placeholder {
+        width: 120px;
+        height: 120px;
+    }
+
+    .player-name-large {
+        font-size: 26px;
+    }
+
+    /* stat blocks shrink a bit so more fit per row */
+    .stat-block {
+        padding: 14px 18px;
+        min-width: 80px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    /* career table scrolls horizontally */
+    .career-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* chat input stacks on very small screens */
+    .chat-input-wrap {
+        gap: 6px;
+    }
+
+    .chat-send {
+        padding: 10px 14px;
+    }
+
+    /* messages take full width on mobile */
+    .chat-msg {
+        max-width: 95%;
+    }
+}
