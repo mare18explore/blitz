@@ -89,3 +89,118 @@
     gap: 4px;
   }
 }
+/* right side of navbar — links + search together */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+/* search icon button */
+.search-icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  line-height: 1;
+}
+
+.search-icon-btn:hover {
+  background: #1e1e2e;
+}
+
+/* search input that appears when icon is clicked */
+.search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-input {
+  width: 220px;
+  padding: 7px 14px;
+  background: #13131a;
+  border: 1px solid #3b82f6;
+  border-radius: 8px;
+  color: #f0f0f0;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: #555555;
+}
+
+.search-close {
+  background: transparent;
+  border: none;
+  color: #888888;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.2s;
+  font-family: inherit;
+}
+
+.search-close:hover {
+  color: #f0f0f0;
+}
+
+/* dropdown results */
+.search-results {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  background: #13131a;
+  border: 1px solid #1e1e2e;
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 200;
+  min-width: 260px;
+}
+
+.search-result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #0d0d0f;
+  transition: background 0.15s;
+}
+
+.search-result-row:last-child {
+  border-bottom: none;
+}
+
+.search-result-row:hover {
+  background: #1a1a2e;
+}
+
+.search-result-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.search-result-meta {
+  font-size: 11px;
+  color: #555555;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* mobile — search input shrinks */
+@media (max-width: 640px) {
+  .search-input {
+    width: 150px;
+  }
+}

@@ -8,7 +8,41 @@ const SEASONS = Array.from(
   { length: currentYear - 2002 + 1 },
   (_, i) => currentYear - i  // starts from current year and counts down
 )
-
+  // ESPN standings endpoint doesn't return team colors so we hardcode them
+const TEAM_COLORS = {
+  '1': 'a71930',  // ATL
+  '2': '00338d',  // BUF
+  '3': '0b162a',  // CHI
+  '4': 'fb4f14',  // CIN
+  '5': '311d00',  // CLE
+  '6': '003594',  // DAL
+  '7': 'fb4f14',  // DEN
+  '8': '0076b6',  // DET
+  '9': '203731',  // GB
+  '10': '4b92db', // TEN
+  '11': '002c5f', // IND
+  '12': 'e31837', // KC
+  '13': 'a5acaf', // LV
+  '14': '003594', // LAR
+  '15': '008e97', // MIA
+  '16': '4f2683', // MIN
+  '17': '002244', // NE
+  '18': 'd3bc8d', // NO
+  '19': '0b2265', // NYG
+  '20': '125740', // NYJ
+  '21': '004c54', // PHI
+  '22': '97233f', // ARI
+  '23': 'ffb612', // PIT
+  '24': '0080c6', // LAC
+  '25': 'aa0000', // SF
+  '26': '002244', // SEA
+  '27': 'd50a0a', // TB
+  '28': '5a1414', // WSH
+  '29': '0085ca', // CAR
+  '30': '006778', // JAX
+  '33': '241773', // BAL
+  '34': '03202f', // HOU
+}
 function Standings() {
   /* useState gives us a value and a function to update it
   when we call the setter function, React re-renders the component */
@@ -85,6 +119,7 @@ function Standings() {
       {/* outer .map() - runs twice, once for AFC and once for NFC */}
       {standings.map((conference) => {
         const isAFC = conference.abbreviation === 'AFC'
+        
 
         return (
           <div key={conference.abbreviation} className="conference-block">
@@ -122,17 +157,20 @@ function Standings() {
                   const wins = entry.stats.find(s => s.name === 'wins')?.displayValue || '0'
                   const losses = entry.stats.find(s => s.name === 'losses')?.displayValue || '0'
                   const pct = entry.stats.find(s => s.name === 'winPercent')?.displayValue || '.000'
-
+                  console.log(entry.team.shortDisplayName, entry.team.color)
                 return (
                   <div
                     key={entry.team.id}
-                    className={`team-row ${index === 0 ? 'first-place' : ''}`}
+                    className={`team-row ${index === 0 ? "first-place" : ""}`}
                     onClick={() => {
-                      const record = entry.stats.find(s => s.name === 'wins')?.displayValue + '-' + 
-                        entry.stats.find(s => s.name === 'losses')?.displayValue
+                      const record = entry.stats.find(s => s.name === "wins")?.displayValue + "-" + 
+                        entry.stats.find(s => s.name === "losses")?.displayValue
                       navigate(`/team/${entry.team.id}/${season}/${record}`)
                     }}
-                    style={{ cursor: 'pointer' }}
+                    style={{ 
+                      cursor: "pointer",
+                      borderLeft: `3px solid #${TEAM_COLORS[entry.team.id] || '1e1e2e'}`
+                    }}
                   >
                     <span className="team-rank">{index + 1}</span>
                     <img
