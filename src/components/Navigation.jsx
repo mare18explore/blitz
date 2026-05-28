@@ -56,9 +56,9 @@ function Navigation() {
         const a = athletes[i]
         return {
           id,
-          name:     a?.displayName || "",
+          name: a?.displayName || "",
           position: a?.position?.abbreviation?.toUpperCase() || "",
-          team:     a?.team?.$ref?.match(/teams\/(\d+)/)?.[1] || ""
+          team: a?.team?.$ref?.match(/teams\/(\d+)/)?.[1] || ""
         }
       }).filter(p => p.name)
 

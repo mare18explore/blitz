@@ -115,6 +115,306 @@
 	animation: pulse 1.5s ease-in-out infinite;
 }
 
+/* tab switcher */
+.home-tabs {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 28px;
+}
+
+/* skeleton card — same shape as .news-card */
+.news-card-skeleton {
+	background: #13131a;
+	border: 1px solid #1e1e2e;
+	border-radius: 12px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+.skel-body {
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.skel {
+	background: #1e1e2e;
+	border-radius: 6px;
+	animation: skel-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skel-pulse {
+	0%, 100% { opacity: 1; }
+	50%       { opacity: 0.4; }
+}
+
+.skel-img {
+	width: 100%;
+	height: 180px;
+	border-radius: 0;
+}
+
+.skel-category {
+	height: 10px;
+	width: 60px;
+}
+
+.skel-headline {
+	height: 14px;
+	width: 100%;
+}
+
+.skel-short {
+	width: 70%;
+}
+
+.skel-blurb {
+	height: 12px;
+	width: 100%;
+}
+
+.skel-shorter {
+	width: 55%;
+}
+
+.skel-meta {
+	height: 10px;
+	width: 80px;
+	margin-top: 4px;
+}
+
+/* predictor */
+.predictor-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 32px;
+}
+
+.predictor-intro {
+	margin-bottom: 4px;
+}
+
+.predictor-label {
+	font-size: 11px;
+	font-weight: 600;
+	color: #3b82f6;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+	margin-bottom: 8px;
+}
+
+.predictor-title {
+	font-size: 28px;
+	font-weight: 800;
+	color: #f0f0f0;
+	letter-spacing: -0.5px;
+	margin-bottom: 10px;
+}
+
+.predictor-title span {
+	color: #3b82f6;
+}
+
+.predictor-subtitle {
+	font-size: 14px;
+	color: #888888;
+	line-height: 1.6;
+	max-width: 580px;
+}
+
+.predictor-card {
+	background: #13131a;
+	border: 1px solid #1e1e2e;
+	border-radius: 16px;
+	padding: 32px;
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.matchup-row {
+	display: flex;
+	align-items: flex-end;
+	gap: 20px;
+}
+
+.team-picker {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.picker-label {
+	font-size: 11px;
+	font-weight: 600;
+	color: #555555;
+	text-transform: uppercase;
+	letter-spacing: 1.5px;
+}
+
+.team-select {
+	padding: 10px 14px;
+	background: #0d0d0f;
+	border: 1px solid #1e1e2e;
+	border-radius: 8px;
+	color: #f0f0f0;
+	font-size: 13px;
+	font-family: inherit;
+	cursor: pointer;
+	outline: none;
+	transition: border-color 0.2s;
+}
+
+.team-select:focus {
+	border-color: rgba(59, 130, 246, 0.4);
+}
+
+.vs-badge {
+	font-size: 13px;
+	font-weight: 800;
+	color: #333355;
+	letter-spacing: 2px;
+	padding-bottom: 10px;
+}
+
+.predict-btn {
+	padding: 12px 24px;
+	background: #3b82f6;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	font-family: inherit;
+	cursor: pointer;
+	align-self: flex-start;
+	transition: background 0.2s;
+}
+
+.predict-btn:hover {
+	background: #2563eb;
+}
+
+.predict-btn:disabled {
+	background: #1e1e2e;
+	color: #555555;
+	cursor: not-allowed;
+}
+
+.predictor-error {
+	font-size: 13px;
+	color: #ef4444;
+}
+
+/* result display */
+.predictor-result {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: #0d0d0f;
+  border: 1px solid #1e1e2e;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.result-team {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.result-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.result-team-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #aaaaaa;
+  text-align: center;
+}
+
+.result-label {
+  font-size: 11px;
+  color: #555555;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.result-prob {
+  font-size: 36px;
+  font-weight: 800;
+  color: #555555;
+  letter-spacing: -1px;
+}
+
+.result-winner .result-team-name {
+  color: #f0f0f0;
+}
+
+.result-winner .result-prob {
+  color: #3b82f6;
+}
+
+.result-divider {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333355;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.result-badge {
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	padding: 3px 10px;
+	border-radius: 999px;
+	margin-top: 4px;
+}
+
+.winner-badge {
+	background: rgba(59, 130, 246, 0.15);
+	color: #3b82f6;
+	border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.loser-badge {
+	background: rgba(239, 68, 68, 0.08);
+	color: #ef4444;
+	border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+@media (max-width: 640px) {
+	.matchup-row {
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.vs-badge {
+		padding-bottom: 0;
+		align-self: center;
+	}
+
+	.predictor-card {
+		padding: 20px;
+	}
+
+	.predictor-result {
+		flex-direction: column;
+		gap: 16px;
+	}
+}
+
+
 @keyframes pulse {
 	0%, 100% { opacity: 1; }
 	50%       { opacity: 0.4; }

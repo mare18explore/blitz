@@ -1,6 +1,11 @@
 {
   "rewrites": [
     {
+    "source": "/api/espn-site/:path*",
+    "destination": "https://site.api.espn.com/:path*"
+    },
+    
+    {
       "source": "/api/espn/:path*",
       "destination": "https://sports.core.api.espn.com/:path*"
     },

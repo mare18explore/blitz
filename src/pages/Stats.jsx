@@ -118,11 +118,11 @@ function Stats() {
 				const teamId = teamIdMatch?.[1]
 				return {
 					id,
-					name:     a?.displayName || '—',
-					team:     NFL_TEAMS[teamId] || '—',
-					number:   a?.jersey || '—',
-					position: a?.position?.abbreviation?.toUpperCase() || '—',
-					stats:    statsMap[id]
+					name: a?.displayName || '—',
+          team: NFL_TEAMS[teamId] || '—',
+          number: a?.jersey || '—',
+          position: a?.position?.abbreviation?.toUpperCase() || '—',
+					stats: statsMap[id]
 				}
 			}).filter(p => p.name !== '—') // drop any whose detail fetch failed
 
