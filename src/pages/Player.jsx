@@ -139,7 +139,11 @@ function Player() {
 			${careerStats.map(s => {
 				const statMap = {}
 				s.categories?.forEach(cat => cat.stats?.forEach(stat => {
+          // issue with context sent to gemini, checks to make sure gemini has the correct passing stats
+        if (!statMap[stat.abbreviation]) {
 					statMap[stat.abbreviation] = stat.displayValue
+        }
+
 				}))
 				return `${s.year}: ${Object.entries(statMap).map(([k, v]) => `${k}: ${v}`).join(', ')}`
 			}).join('\n')}
@@ -276,7 +280,10 @@ function Player() {
 									const statMap = {}
 									season.categories?.forEach(cat => {
 										cat.stats?.forEach(stat => {
-											statMap[stat.abbreviation] = stat.displayValue
+                      if (!statMap[stat.abbreviation]) {
+                        //passing takes priority over rushing for QBs
+                          statMap[stat.abbreviation] = stat.displayValue
+                      }
 										})
 									})
 									return (

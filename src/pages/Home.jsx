@@ -23,162 +23,162 @@ function NewsSkeleton() {
 }
 
 function GamePredictor() {
-  const [homeId, setHomeId] = useState('')
-  const [awayId, setAwayId] = useState('')
-  const [result, setResult] = useState(null)  // prediction response from Flask
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [teams, setTeams] = useState([])  // fetched from ESPN so we get real logos
+	const [homeId, setHomeId] = useState('')
+	const [awayId, setAwayId] = useState('')
+	const [result, setResult] = useState(null)  // prediction response from Flask
+	const [loading, setLoading] = useState(false)
+	const [error, setError] = useState(null)
+	const [teams, setTeams] = useState([])  // fetched from ESPN so we get real logos
 
-  // fetch all NFL teams from ESPN when the predictor loads
-  useEffect(() => {
-    fetch('/api/espn-site/apis/site/v2/sports/football/nfl/teams?limit=40')
-      .then(res => res.json())
-      .then(data => {
-        // ESPN returns teams nested inside sports > leagues > teams
-        const raw = data.sports?.[0]?.leagues?.[0]?.teams || []
-        // flatten to just what we need — id, name, logo
-        const parsed = raw.map(t => ({
-          id: String(t.team.id),
-          name: t.team.displayName,
-          logo: t.team.logos?.[0]?.href || ''
-        }))
-        // sort alphabetically so the dropdown is easy to scan
-        parsed.sort((a, b) => a.name.localeCompare(b.name))
-        setTeams(parsed)
-        console.log('teams loaded:', parsed.length, parsed[0])
-      })
-      .catch((err) => {
-        console.error('failed to fetch teams', err)
-      })
-  }, [])
+	// fetch all NFL teams from ESPN when the predictor loads
+	useEffect(() => {
+		fetch('/api/espn-site/apis/site/v2/sports/football/nfl/teams?limit=40')
+			.then(res => res.json())
+			.then(data => {
+				// ESPN returns teams nested inside sports > leagues > teams
+				const raw = data.sports?.[0]?.leagues?.[0]?.teams || []
+				// flatten to just what we need — id, name, logo
+				const parsed = raw.map(t => ({
+					id: String(t.team.id),
+					name: t.team.displayName,
+					logo: t.team.logos?.[0]?.href || ''
+				}))
+				// sort alphabetically so the dropdown is easy to scan
+				parsed.sort((a, b) => a.name.localeCompare(b.name))
+				setTeams(parsed)
+				console.log('teams loaded:', parsed.length, parsed[0])
+			})
+			.catch((err) => {
+				console.error('failed to fetch teams', err)
+			})
+	}, [])
 
-  async function predict() {
-    // dont bother if they havent picked both teams yet
-    if (!homeId || !awayId) return
+	async function predict() {
+		// dont bother if they havent picked both teams yet
+		if (!homeId || !awayId) return
 
-    // same team on both sides doesnt make sense
-    if (homeId === awayId) {
-      setError('Pick two different teams')
-      return
-    }
+		// same team on both sides doesnt make sense
+		if (homeId === awayId) {
+			setError('Pick two different teams')
+			return
+		}
 
-    setLoading(true)
-    setError(null)
-    setResult(null)
+		setLoading(true)
+		setError(null)
+		setResult(null)
 
-    try {
-      // POST to Flask — proxied through Vite so no CORS issues in dev
-      const res = await fetch('/api/predictor/predict', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ home_id: homeId, away_id: awayId })
-      })
-      const data = await res.json()
-      // data comes back as { home_win_prob: 57.4, away_win_prob: 42.6 }
-      setResult(data)
-    } catch (err) {
-      // most likely cause is Flask server not running
-      setError('Could not reach predictor — make sure the Flask server is running')
-    } finally {
-      setLoading(false)
-    }
-  }
+		try {
+			// POST to Flask — proxied through Vite so no CORS issues in dev
+			const res = await fetch('/api/predictor/predict', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ home_id: homeId, away_id: awayId })
+			})
+			const data = await res.json()
+			// data comes back as { home_win_prob: 57.4, away_win_prob: 42.6 }
+			setResult(data)
+		} catch (err) {
+			// most likely cause is Flask server not running
+			setError('Could not reach predictor — make sure the Flask server is running')
+		} finally {
+			setLoading(false)
+		}
+	}
 
-  // look up full team info from the fetched ESPN data
-  const homeTeam = teams.find(t => t.id === homeId)
-  const awayTeam = teams.find(t => t.id === awayId)
-  const homeName = homeTeam?.name || ''
-  const awayName = awayTeam?.name || ''
-  const homeLogo = homeTeam?.logo || ''
-  const awayLogo = awayTeam?.logo || ''
+	// look up full team info from the fetched ESPN data
+	const homeTeam = teams.find(t => t.id === homeId)
+	const awayTeam = teams.find(t => t.id === awayId)
+	const homeName = homeTeam?.name || ''
+	const awayName = awayTeam?.name || ''
+	const homeLogo = homeTeam?.logo || ''
+	const awayLogo = awayTeam?.logo || ''
 
-  return (
-    <div className="predictor-wrap">
+	return (
+		<div className="predictor-wrap">
 
-      <div className="predictor-intro">
-        <p className="predictor-label">Machine Learning</p>
-        <h2 className="predictor-title">Game <span>Predictor</span></h2>
-        {/* brief explanation of what the model actually uses */}
-        <p className="predictor-subtitle">
-          Select a home and away team to get a win probability based on Elo ratings, offensive and defensive ratings, and home field advantage.
-        </p>
-      </div>
+			<div className="predictor-intro">
+				<p className="predictor-label">Machine Learning</p>
+				<h2 className="predictor-title">Game <span>Predictor</span></h2>
+				{/* brief explanation of what the model actually uses */}
+				<p className="predictor-subtitle">
+					Select a home and away team to get a win probability based on Elo ratings, offensive and defensive ratings, and home field advantage.
+				</p>
+			</div>
 
-      <div className="predictor-card">
-        <div className="matchup-row">
+			<div className="predictor-card">
+				<div className="matchup-row">
 
-          {/* home team picker */}
-          <div className="team-picker">
-            <p className="picker-label">Home Team</p>
-            <select
-              className="team-select"
-              value={homeId}
-              onChange={e => setHomeId(e.target.value)}
-            >
-              <option value="">Select team...</option>
-              {teams.map(t => (
-                <option key={t.id} value={t.id}>{t.name}</option>
-              ))}
-            </select>
-          </div>
+					{/* home team picker */}
+					<div className="team-picker">
+						<p className="picker-label">Home Team</p>
+						<select
+							className="team-select"
+							value={homeId}
+							onChange={e => setHomeId(e.target.value)}
+						>
+							<option value="">Select team...</option>
+							{teams.map(t => (
+								<option key={t.id} value={t.id}>{t.name}</option>
+							))}
+						</select>
+					</div>
 
-          <div className="vs-badge">VS</div>
+					<div className="vs-badge">VS</div>
 
-          {/* away team picker */}
-          <div className="team-picker">
-            <p className="picker-label">Away Team</p>
-            <select
-              className="team-select"
-              value={awayId}
-              onChange={e => setAwayId(e.target.value)}
-            >
-              <option value="">Select team...</option>
-              {teams.map(t => (
-                <option key={t.id} value={t.id}>{t.name}</option>
-              ))}
-            </select>
-          </div>
-        </div>
+					{/* away team picker */}
+					<div className="team-picker">
+						<p className="picker-label">Away Team</p>
+						<select
+							className="team-select"
+							value={awayId}
+							onChange={e => setAwayId(e.target.value)}
+						>
+							<option value="">Select team...</option>
+							{teams.map(t => (
+								<option key={t.id} value={t.id}>{t.name}</option>
+							))}
+						</select>
+					</div>
+				</div>
 
-        {/* button stays disabled until both teams are picked */}
-        <button
-          className="predict-btn"
-          onClick={predict}
-          disabled={!homeId || !awayId || loading}
-        >
-          {loading ? 'Predicting...' : 'Predict Winner'}
-        </button>
+				{/* button stays disabled until both teams are picked */}
+				<button
+					className="predict-btn"
+					onClick={predict}
+					disabled={!homeId || !awayId || loading}
+				>
+					{loading ? 'Predicting...' : 'Predict Winner'}
+				</button>
 
-        {/* only shows if something went wrong */}
-        {error && <p className="predictor-error">{error}</p>}
+				{/* only shows if something went wrong */}
+				{error && <p className="predictor-error">{error}</p>}
 
-        {/* result card — winner gets blue prob, loser gets red */}
-        {result && (
-          <div className="predictor-result">
-            <div className={`result-team ${result.home_win_prob > 50 ? 'result-winner' : 'result-loser'}`}>
-              {homeLogo && <img src={homeLogo} alt={homeName} className="result-logo" />}
-              <p className="result-team-name">{homeName}</p>
-              <p className="result-label">Home</p>
-              <p className="result-prob">{result.home_win_prob}%</p>
-              {result.home_win_prob > 50 && <span className="result-badge winner-badge">Predicted Winner</span>}
-              {result.home_win_prob < 50 && <span className="result-badge loser-badge">Predicted Loser</span>}
-            </div>
-            <div className="result-divider">vs</div>
-            <div className={`result-team ${result.away_win_prob > 50 ? 'result-winner' : 'result-loser'}`}>
-              {awayLogo && <img src={awayLogo} alt={awayName} className="result-logo" />}
-              <p className="result-team-name">{awayName}</p>
-              <p className="result-label">Away</p>
-              <p className="result-prob">{result.away_win_prob}%</p>
-              {result.away_win_prob > 50 && <span className="result-badge winner-badge">Predicted Winner</span>}
-              {result.away_win_prob < 50 && <span className="result-badge loser-badge">Predicted Loser</span>}
-            </div>
-          </div>
-        )}
-      </div>
+				{/* result card — winner gets blue prob, loser gets red */}
+				{result && (
+					<div className="predictor-result">
+						<div className={`result-team ${result.home_win_prob > 50 ? 'result-winner' : 'result-loser'}`}>
+							{homeLogo && <img src={homeLogo} alt={homeName} className="result-logo" />}
+							<p className="result-team-name">{homeName}</p>
+							<p className="result-label">Home</p>
+							<p className="result-prob">{result.home_win_prob}%</p>
+							{result.home_win_prob > 50 && <span className="result-badge winner-badge">Predicted Winner</span>}
+							{result.home_win_prob < 50 && <span className="result-badge loser-badge">Predicted Loser</span>}
+						</div>
+						<div className="result-divider">vs</div>
+						<div className={`result-team ${result.away_win_prob > 50 ? 'result-winner' : 'result-loser'}`}>
+							{awayLogo && <img src={awayLogo} alt={awayName} className="result-logo" />}
+							<p className="result-team-name">{awayName}</p>
+							<p className="result-label">Away</p>
+							<p className="result-prob">{result.away_win_prob}%</p>
+							{result.away_win_prob > 50 && <span className="result-badge winner-badge">Predicted Winner</span>}
+							{result.away_win_prob < 50 && <span className="result-badge loser-badge">Predicted Loser</span>}
+						</div>
+					</div>
+				)}
+			</div>
 
-    </div>
-  )
+		</div>
+	)
 }
 
 function Home() {
@@ -234,12 +234,12 @@ function Home() {
 					{!loading && !error && (
 						<div className="news-grid">
 							{articles.map(article => (
-                  <a
+									<a
 									key={article.dataSourceIdentifier || article.id}
-                  href={article.links?.web?.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="news-card"
+									href={article.links?.web?.href}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="news-card"
 								>
 									{article.images?.[0]?.url && (
 										<img
