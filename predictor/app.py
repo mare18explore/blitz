@@ -3,6 +3,7 @@ from flask_cors import CORS
 import pickle, os
 import numpy as np
 import psycopg2 
+import requests
 
 app = Flask(__name__)
 CORS(app)  # allows our React app to call this API without CORS errors
@@ -99,6 +100,16 @@ def predict():
     "away_win_prob": away_prob,
   })
 
+@app.route("/teams", methods=["GET"])
+def get_teams():
+  # fetch teams from espn server-side so safari's browser headers dont get 403'd
+  try:
+    r = requests.get("https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams?limit=40")
+    return jsonify(r.json())
+  except Exception as e:
+    print("failed to fetch teams:", e)
+    return jsonify({"error": "could not fetch teams"}), 500
+  
 @app.route("/predictions", methods=["GET"])
 def get_predictions():
     # pull the 10 most recent predictions, newest first
