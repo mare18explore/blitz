@@ -2,9 +2,17 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pickle, os
 import numpy as np
+import psycopg2 
 
 app = Flask(__name__)
 CORS(app)  # allows our React app to call this API without CORS errors
+
+# grab the neon connection string from the environment
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+def get_db():
+  # opens a fresh connection to postgres each time we need one
+  return psycopg2.connect(DATABASE_URL)
 
 # load the model and team stats we saved during training
 model = pickle.load(open("model.pkl", "rb"))
@@ -59,12 +67,70 @@ def predict():
   home_win_prob = model.predict_proba(features)[0][1]
   away_win_prob = 1 - home_win_prob
 
+  # round to match what we send back to the frontend
+  home_prob = round(float(home_win_prob) * 100, 1)
+  away_prob = round(float(away_win_prob) * 100, 1)
+  predicted_winner = home_id if home_prob > away_prob else away_id
+
+  # save this prediction to postgres so we can show history later
+  # wrapped in try/except so a db hiccup doesnt break the actual prediction
+  try:
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+      """
+      insert into predictions
+        (home_team_id, away_team_id, home_win_prob, away_win_prob, predicted_winner)
+      values (%s, %s, %s, %s, %s)
+      """,
+      (home_id, away_id, home_prob, away_prob, predicted_winner)
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
+  except Exception as e:
+    print("failed to save prediction:", e)
+
+
   return jsonify({
     "home_id": home_id,
     "away_id": away_id,
-    "home_win_prob": round(float(home_win_prob) * 100, 1),
-    "away_win_prob": round(float(away_win_prob) * 100, 1),
-})
+    "home_win_prob": home_prob,
+    "away_win_prob": away_prob,
+  })
+
+@app.route("/predictions", methods=["GET"])
+def get_predictions():
+    # pull the 10 most recent predictions, newest first
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        select home_team_id, away_team_id, home_win_prob, away_win_prob,
+               predicted_winner, created_at
+        from predictions
+        order by created_at desc
+        limit 10
+        """
+    )
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    # turn each row tuple into an object the frontend can use
+    predictions = [
+        {
+            "home_id": r[0],
+            "away_id": r[1],
+            "home_win_prob": float(r[2]),
+            "away_win_prob": float(r[3]),
+            "predicted_winner": r[4],
+            "created_at": r[5].isoformat(),
+        }
+        for r in rows
+    ]
+    return jsonify(predictions)
+
 
 if __name__ == "__main__":
   port = int(os.environ.get("PORT", 5001))

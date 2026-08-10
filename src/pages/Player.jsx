@@ -125,7 +125,7 @@ function Player() {
 		if (!input.trim() || chatLoading) return
 
 		// build a context string with everything we know about this player
-		// this gets sent to Claude so it can answer questions accurately
+		// this gets sent to Gemini so it can answer accurately
 		const playerContext = `
 			You are a knowledgeable NFL analyst assistant. You have access to the following player's data:
 			Name: ${name}
@@ -304,7 +304,7 @@ function Player() {
 				</div>
 			)}
 
-			{/* AI chat — passes player bio + career stats as context so Claude can answer accurately */}
+			{/* AI chat — passes player bio + career stats as context so Gemini can answer accurately */}
 			<div className="player-chat">
 				<p className="section-label">Ask about {name}</p>
 

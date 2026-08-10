@@ -23,6 +23,8 @@ function NewsSkeleton() {
 }
 
 function GamePredictor() {
+	// recent predictions from the db
+	const [history, setHistory] = useState([])
 	const [homeId, setHomeId] = useState('')
 	const [awayId, setAwayId] = useState('')
 	const [result, setResult] = useState(null)  // prediction response from Flask
@@ -84,6 +86,15 @@ function GamePredictor() {
 			setLoading(false)
 		}
 	}
+
+	// load recent predictions from our flask/postgres endpoint
+  // runs on mount and again after each new prediction so the list stays fresh
+  useEffect(() => {
+    fetch('/api/predictor/predictions')
+      .then(res => res.json())
+      .then(data => setHistory(data))
+      .catch(err => console.error('failed to load history', err))
+  }, [result])
 
 	// look up full team info from the fetched ESPN data
 	const homeTeam = teams.find(t => t.id === homeId)
@@ -177,6 +188,32 @@ function GamePredictor() {
 				)}
 			</div>
 
+        {history.length > 0 && (
+          <div className="history-wrap">
+            <p className="predictor-label">Recent Predictions</p>
+            <div className="history-list">
+              {history.map((h, i) => {
+                // turn the stored team ids back into names using the teams we already fetched
+                const home = teams.find(t => t.id === h.home_id)
+                const away = teams.find(t => t.id === h.away_id)
+                const homeName = home?.name || h.home_id
+                const awayName = away?.name || h.away_id
+                // the model's pick — matches whichever id got stored as predicted_winner
+                const pickName = h.predicted_winner === h.home_id ? homeName : awayName
+
+                return (
+                  <div key={i} className="history-row">
+                    <span className="history-matchup">{homeName} vs {awayName}</span>
+                    <span className="history-pick">Pick: {pickName}</span>
+                    <span className="history-prob">
+                      {Math.max(h.home_win_prob, h.away_win_prob)}%
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
 		</div>
 	)
 }
