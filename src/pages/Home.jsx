@@ -34,7 +34,7 @@ function GamePredictor() {
 
 	// fetch all NFL teams from ESPN when the predictor loads
 	useEffect(() => {
-		fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams?limit=40')
+		fetch('/api/espn-site/apis/site/v2/sports/football/nfl/teams?limit=40')
 			.then(res => res.json())
 			.then(data => {
 				// ESPN returns teams nested inside sports > leagues > teams
