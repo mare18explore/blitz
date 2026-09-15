@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import '../styles/Home.css'
+import WeeklySchedule from './Schedule'
 
 // skeleton grid shown while articles load — mirrors the shape of real news cards
 function NewsSkeleton() {
@@ -261,6 +262,12 @@ function Home() {
 				>
 					Game Predictor
 				</button>
+				<button
+					className={`stats-tab ${activeTab === 'schedule' ? 'active' : ''}`}
+					onClick={() => setActiveTab('schedule')}
+				>
+					This Weeks Games
+				</button>
 			</div>
 
 			{/* news tab */}
@@ -305,6 +312,7 @@ function Home() {
 
 			{/* predictor tab  wired to Flask API */}
 			{activeTab === 'predictor' && <GamePredictor />}
+			{activeTab === 'schedule' && <WeeklySchedule />}
 
 		</div>
 	)

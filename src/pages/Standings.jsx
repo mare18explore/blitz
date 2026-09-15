@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import '../styles/Standings.css'
 
 // generate every season from 2002 up to the current year
-const currentYear = (new Date().getFullYear())-1
+const currentYear = (new Date().getFullYear())
 const SEASONS = Array.from(
   { length: currentYear - 2002 + 1 },
   (_, i) => currentYear - i  // starts from current year and counts down

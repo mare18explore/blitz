@@ -5,10 +5,11 @@ import numpy as np
 import psycopg2 
 import requests
 
+
 app = Flask(__name__)
 CORS(app)  # allows our React app to call this API without CORS errors
 
-# grab the neon connection string from the environment
+# postgres connection string from the environment, points at AWS RDS.
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 def get_db():
@@ -98,6 +99,98 @@ def predict():
     "away_id": away_id,
     "home_win_prob": home_prob,
     "away_win_prob": away_prob,
+  })
+
+@app.route("/scoreboard", methods=["GET"])
+def get_scoreboard():
+  # same server-side proxy reason as /teams, safari gets 403'd going direct
+  url = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
+  try:
+    r = requests.get(url, timeout=10)
+    data = r.json()
+  except Exception as e:
+    print("failed to fetch scoreboard:", e)
+    return jsonify({"error": "could not fetch scoreboard"}), 500
+
+  games = []
+
+  for event in data.get("events", []):
+    comp = (event.get("competitions") or [{}])[0]
+    status = comp.get("status", {}).get("type", {})
+
+    home = None
+    away = None
+    for side in comp.get("competitors", []):
+      info = side.get("team", {})
+      records = side.get("records") or []
+      parsed = {
+        "id": str(info.get("id")),
+        "name": info.get("shortDisplayName"),
+        "logo": info.get("logo"),
+        "score": side.get("score"),
+        # first entry is the overall record, the rest are home/away splits
+        "record": records[0].get("summary") if records else None,
+      }
+      if side.get("homeAway") == "home":
+        home = parsed
+      else:
+        away = parsed
+
+    games.append({
+      "id": event.get("id"),
+      "date": event.get("date"),
+      # pre, in or post, easier to switch on in React than the full status text
+      "state": status.get("state"),
+      "detail": status.get("shortDetail"),
+      "home": home,
+      "away": away,
+    })
+
+  return jsonify({"week": data.get("week", {}).get("number"), "games": games})
+@app.route("/game/<game_id>", methods=["GET"])
+def get_game(game_id):
+  # espn's summary endpoint has the full box score for a single game
+  url = f"https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event={game_id}"
+  try:
+    r = requests.get(url, timeout=10)
+    data = r.json()
+  except Exception as e:
+    print("failed to fetch game summary:", e)
+    return jsonify({"error": "could not fetch game"}), 500
+
+  header = data.get("header", {})
+  comp = (header.get("competitions") or [{}])[0]
+  status = comp.get("status", {}).get("type", {})
+
+  # the box score lists both teams with their stat totals
+  teams = []
+  for entry in data.get("boxscore", {}).get("teams", []):
+    info = entry.get("team", {})
+    # espn gives stats as a flat list of name/value pairs, easier to use as a dict
+    stats = {s.get("name"): s.get("displayValue") for s in entry.get("statistics", [])}
+    teams.append({
+      "id": str(info.get("id")),
+      "name": info.get("displayName"),
+      "logo": info.get("logo"),
+      "stats": stats,
+    })
+
+  # scores live on the header competitors, not in the boxscore
+  scores = {}
+  for side in comp.get("competitors", []):
+    scores[str(side.get("id"))] = {
+      "score": side.get("score"),
+      "homeAway": side.get("homeAway"),
+      "record": (side.get("record") or [{}])[0].get("summary"),
+    }
+
+  return jsonify({
+    "id": game_id,
+    "date": comp.get("date"),
+    "state": status.get("state"),
+    "detail": status.get("shortDetail"),
+    "teams": teams,
+    "scores": scores,
   })
 
 @app.route("/teams", methods=["GET"])

@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Stats from './pages/Stats'
 import Player from './pages/Player'
 import Team from './pages/Team'
+import Game from './pages/Game'
 import './styles/Navbar.css'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="/stats" element={<Stats/>} /> 
           <Route path="/player/:id" element={<Player />} />
           <Route path="/team/:id/:season/:record" element={<Team />} />
+          <Route path="/game/:id" element={<Game />} />
         </Routes>
       </main>
     </BrowserRouter>

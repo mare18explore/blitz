@@ -1,0 +1,172 @@
+.game-container {
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 40px 24px;
+}
+
+.game-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	background: #13131a;
+	border: 1px solid #1e1e2e;
+	border-radius: 12px;
+	padding: 28px 24px;
+	margin-bottom: 36px;
+}
+
+.game-team {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	flex: 1;
+}
+
+.game-logo {
+	width: 64px;
+	height: 64px;
+	object-fit: contain;
+}
+
+.game-team-name {
+	font-size: 16px;
+	font-weight: 600;
+	color: #888888;
+	text-align: center;
+}
+
+.game-team-label {
+	font-size: 11px;
+	font-weight: 600;
+	color: #555555;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+/* winner gets brightened, same idea as the first-place rows in standings */
+.game-winner .game-team-name {
+	color: #ffffff;
+}
+
+.game-score-wrap {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	flex-shrink: 0;
+}
+
+.game-score {
+	font-size: 36px;
+	font-weight: 800;
+	color: #f0f0f0;
+	letter-spacing: -1px;
+}
+
+.game-score span {
+	color: #333355;
+	margin: 0 6px;
+}
+
+.game-vs {
+	font-size: 20px;
+	font-weight: 700;
+	color: #333355;
+	letter-spacing: 1px;
+}
+
+.game-status {
+	font-size: 11px;
+	font-weight: 600;
+	color: #555555;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	text-align: center;
+}
+
+.game-live {
+	color: #3b82f6;
+}
+
+.game-stats-table {
+	background: #13131a;
+	border: 1px solid #1e1e2e;
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+.game-stat-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 20px;
+	border-bottom: 1px solid #0d0d0f;
+}
+
+.game-stat-row:last-child {
+	border-bottom: none;
+}
+
+.game-stat-value {
+	font-size: 14px;
+	font-weight: 600;
+	color: #e0e0e0;
+	width: 80px;
+}
+
+/* away value sits left, home value right, label centred between them */
+.game-stat-value:last-child {
+	text-align: right;
+}
+
+.game-stat-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: #555555;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	text-align: center;
+	flex: 1;
+}
+
+/* mobile — kicks in on screens narrower than 640px */
+@media (max-width: 640px) {
+.game-container {
+	padding: 24px 16px;
+}
+
+/* tighten the header so both logos and the score still fit */
+.game-header {
+	padding: 20px 12px;
+	gap: 8px;
+}
+
+.game-logo {
+	width: 44px;
+	height: 44px;
+}
+
+.game-team-name {
+	font-size: 13px;
+}
+
+.game-score {
+	font-size: 26px;
+}
+
+.game-stat-row {
+	padding: 10px 12px;
+}
+
+.game-stat-label {
+	font-size: 11px;
+}
+
+/* narrower value columns so long labels dont wrap */
+.game-stat-value {
+	width: 56px;
+	font-size: 13px;
+}
+}
