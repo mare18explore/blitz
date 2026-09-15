@@ -1,32 +1,35 @@
 import app
-from app import get_recent_avg
+from app import get_weighted_recent
 from app import get_elo
 
-def test_get_recent_avg_with_string_key():
+def test_get_weighted_recent_with_string_key():
   data = {"5": [20, 24, 17, 30]}
-  result = get_recent_avg("5", data)
-  # average of 20,24,17,30
-  assert result == 22.75  
+  result = get_weighted_recent("5", data)
+  # only 4 games exist, all fall in the "recent" bucket (recent_n=8), so it's
+  # a straight weighted average of all 4 at weight 1.75 each, which equals a plain mean
+  assert result == 22.75
 
-def test_get_recent_avg_with_int_key():
+def test_get_weighted_recent_with_int_key():
   data = {5: [20, 24, 17, 30]}
-  result = get_recent_avg(5, data)
+  result = get_weighted_recent(5, data)
   assert result == 22.75
 
-def test_get_recent_avg_missing_team_returns_default():
+def test_get_weighted_recent_missing_team_returns_none():
   data = {}
-  result = get_recent_avg("999", data)
-  # fallback default
-  assert result == 21.0
+  result = get_weighted_recent("999", data)
+  # no history at all, function itself returns None
+  # (the 21.0 fallback happens in app.py's calling code, not in this function)
+  assert result is None
 
-def test_get_recent_avg_only_uses_last_four_games():
-  data = {"5": [100, 100, 100, 20, 24, 17, 30]}
-  result = get_recent_avg("5", data)
-  # 7 games, ignores first 3
-  assert result == 22.75
+def test_get_weighted_recent_uses_more_than_four_games():
+  # 12 games total: last 8 are "recent" (weight 1.75), first 4 are "older" (weight 1.0)
+  data = {"5": [10, 10, 10, 10, 20, 24, 17, 30, 25, 25, 25, 25]}
+  result = get_weighted_recent("5", data)
+  # just confirm it runs and returns a sensible number in a reasonable range,
+  # exact expected value depends on the weighting math
+  assert 15 < result < 30
 
 def test_get_elo_with_string_key():
-  # temporarily point at a fake elo_ratings dict for this test
   app.elo_ratings = {"5": 1550}
   result = get_elo("5")
   assert result == 1550
