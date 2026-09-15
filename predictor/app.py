@@ -5,33 +5,77 @@ import numpy as np
 import psycopg2 
 import requests
 
-
 app = Flask(__name__)
 CORS(app)  # allows our React app to call this API without CORS errors
 
 # postgres connection string from the environment, points at AWS RDS.
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
+model = pickle.load(open("model.pkl", "rb"))
+scaler = pickle.load(open("scaler.pkl", "rb"))
+elo_ratings = pickle.load(open("elo_ratings.pkl", "rb"))
+recent_scores = pickle.load(open("recent_scores.pkl", "rb"))
+recent_allowed = pickle.load(open("recent_allowed.pkl", "rb"))
+last_game_date = pickle.load(open("last_game_date.pkl", "rb"))
+recent_results = pickle.load(open("recent_results.pkl", "rb"))
+recent_turnovers = pickle.load(open("recent_turnovers.pkl", "rb"))
+
 def get_db():
   # opens a fresh connection to postgres each time we need one
   return psycopg2.connect(DATABASE_URL)
 
-# load the model and team stats we saved during training
-model = pickle.load(open("model.pkl", "rb"))
-elo_ratings = pickle.load(open("elo_ratings.pkl", "rb"))
-recent_scores = pickle.load(open("recent_scores.pkl", "rb"))
-recent_allowed = pickle.load(open("recent_allowed.pkl", "rb"))
-
+def get_current_week():
+    # ask ESPN what week it currently is, so we can calculate real rest days
+    try:
+        r = requests.get("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard", timeout=10)
+        data = r.json()
+        return data.get("week", {}).get("number", 1)
+    except Exception as e:
+        print("failed to fetch current week, defaulting to normal rest:", e)
+        return None
+    
 def get_elo(team_id):
   # try string first, then int — ESPN ids come back as strings from React
   # but might be stored as ints in the pkl file from pandas
   return elo_ratings.get(str(team_id)) or elo_ratings.get(int(team_id)) or 1500
 
-def get_recent_avg(team_id, data_dict):
-  # try string first, then int — same reason as get_elo
-  recent = data_dict.get(str(team_id)) or data_dict.get(int(team_id)) or []
-  recent = recent[-4:]
-  return float(np.mean(recent)) if recent else 21.0
+TEAM_DIVISION = {
+    "2": "AFC East", "15": "AFC East", "17": "AFC East", "20": "AFC East",
+    "4": "AFC North", "5": "AFC North", "23": "AFC North", "33": "AFC North",
+    "10": "AFC South", "11": "AFC South", "30": "AFC South", "34": "AFC South",
+    "7": "AFC West", "12": "AFC West", "13": "AFC West", "24": "AFC West",
+    "6": "NFC East", "19": "NFC East", "21": "NFC East", "28": "NFC East",
+    "3": "NFC North", "8": "NFC North", "9": "NFC North", "16": "NFC North",
+    "1": "NFC South", "18": "NFC South", "27": "NFC South", "29": "NFC South",
+    "14": "NFC West", "22": "NFC West", "25": "NFC West", "26": "NFC West",
+}
+
+def get_division(team_id):
+    return TEAM_DIVISION.get(str(team_id))
+
+def get_weighted_recent(team_id, data_dict, recent_n=8, older_n=8, recent_weight=1.75, older_weight=1.0):
+    all_games = data_dict.get(str(team_id)) or data_dict.get(team_id) or []
+    total_needed = recent_n + older_n
+    window = all_games[-total_needed:]
+
+    if not window:
+        return None
+
+    recent_games = window[-recent_n:]
+    older_games = window[:-recent_n] if len(window) > recent_n else []
+
+    values = recent_games + older_games
+    weights = [recent_weight] * len(recent_games) + [older_weight] * len(older_games)
+
+    return float(np.average(values, weights=weights))
+
+def get_recent_form(team_id):
+    results = (recent_results.get(str(team_id)) or recent_results.get(team_id) or [])[-4:]
+    return float(np.mean(results)) if results else 0.5
+
+def get_avg_turnovers(team_id):
+    recent = (recent_turnovers.get(str(team_id)) or recent_turnovers.get(team_id) or [])[-4:]
+    return float(np.mean(recent)) if recent else 1.5
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -46,27 +90,55 @@ def predict():
   # build the same features we used during training
   home_elo = get_elo(home_id)
   away_elo = get_elo(away_id)
-  home_off = get_recent_avg(home_id, recent_scores)
-  away_off = get_recent_avg(away_id, recent_scores)
-  home_def = get_recent_avg(home_id, recent_allowed)
-  away_def = get_recent_avg(away_id, recent_allowed)
+
+  home_off = get_weighted_recent(home_id, recent_scores) or 21
+  away_off = get_weighted_recent(away_id, recent_scores) or 21
+  home_def = get_weighted_recent(home_id, recent_allowed) or 21
+  away_def = get_weighted_recent(away_id, recent_allowed) or 21
+
+  current_week = get_current_week()
+
+  if current_week:
+    home_rest = current_week - last_game_date.get(str(home_id), current_week - 1)
+    away_rest = current_week - last_game_date.get(str(away_id), current_week - 1)
+  else:
+    home_rest = 1
+    away_rest = 1
+
+  home_form = get_recent_form(home_id)
+  away_form = get_recent_form(away_id)
+
+  if get_division(home_id) == get_division(away_id) and get_division(home_id) is not None:
+    same_division = 1
+  else:
+    same_division = 0
+
+  home_turnover_avg = get_avg_turnovers(home_id)
+  away_turnover_avg = get_avg_turnovers(away_id)
+  turnover_diff = away_turnover_avg - home_turnover_avg
 
   features = np.array([[
     home_elo,
     away_elo,
-    # elo_diff
     home_elo - away_elo,
     home_off,
     away_off,
     home_def,
     away_def,
-    1,  # home_rest — assume normal rest
-    1,  # away_rest — assume normal rest
-    1   # home_field — always 1 for home team
+    home_rest,
+    away_rest,
+    1,
+    home_form,
+    away_form,
+    same_division,
+    turnover_diff
   ]])
 
+  # scale the features the same way they were scaled during training
+  features_scaled = scaler.transform(features)
+
   # predict_proba returns [prob_loss, prob_win] — we want the second one
-  home_win_prob = model.predict_proba(features)[0][1]
+  home_win_prob = model.predict_proba(features_scaled)[0][1]
   away_win_prob = 1 - home_win_prob
 
   # round to match what we send back to the frontend

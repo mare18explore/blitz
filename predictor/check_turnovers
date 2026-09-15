@@ -1,0 +1,18 @@
+import requests
+import json
+
+# pick any real, completed game_id, you can grab one from your /scoreboard endpoint
+# or just use a known one from last season for testing
+game_id = "401547439"  # replace with a real completed game id if this one doesn't work
+
+url = f"https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event={game_id}"
+r = requests.get(url, timeout=10)
+data = r.json()
+
+# look at each team's stats and print anything with "turnover" in the name
+for entry in data.get("boxscore", {}).get("teams", []):
+    team_name = entry.get("team", {}).get("displayName")
+    print(f"\n{team_name}:")
+    for stat in entry.get("statistics", []):
+        if "turnover" in stat.get("name", "").lower() or "interception" in stat.get("name", "").lower() or "fumble" in stat.get("name", "").lower():
+            print(f"  {stat.get('name')}: {stat.get('displayValue')}")

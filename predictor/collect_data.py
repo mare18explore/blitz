@@ -19,6 +19,26 @@ def fetch_games(season, week):
     print(f"failed {season} week {week}: {e}")
     return []
 
+def fetch_turnovers(event_id):
+    # hit ESPN's summary endpoint for one game and pull turnover counts for both teams
+    url = f"https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event={event_id}"
+    try:
+        res = requests.get(url, timeout=10)
+        data = res.json()
+        teams = data.get("boxscore", {}).get("teams", [])
+
+        turnovers = {}
+        for entry in teams:
+            team_id = str(entry.get("team", {}).get("id"))
+            for stat in entry.get("statistics", []):
+                if stat.get("name") == "turnovers":
+                    turnovers[team_id] = int(stat.get("displayValue", 0))
+                    break
+
+        return turnovers
+    except Exception as e:
+        print(f"failed to fetch turnovers for event {event_id}: {e}")
+        return {}
 
 def parse_game(event):
   # pull the two teams out of the competitors array
@@ -48,8 +68,14 @@ def parse_game(event):
   home_score = int(home_team.get("score", 0))
   away_score = int(away_team.get("score", 0))
 
-  # home_win is our target variable — 1 if home team won, 0 if they lost
+  # home_win is our target variable, 1 if home team won, 0 if they lost
   home_win = 1 if home_score > away_score else 0
+
+  # fetch turnover counts for this specific game
+  event_id = event.get("id")
+  turnovers = fetch_turnovers(event_id)
+  home_turnovers = turnovers.get(str(home_team["team"]["id"]), 0)
+  away_turnovers = turnovers.get(str(away_team["team"]["id"]), 0)
 
   return {
     "season": event.get("season", {}).get("year"),
@@ -58,6 +84,8 @@ def parse_game(event):
     "away_id": away_team["team"]["id"],
     "home_score": home_score,
     "away_score": away_score,
+    "home_turnovers": home_turnovers,
+    "away_turnovers": away_turnovers,
     "home_win": home_win
   }
 
@@ -66,7 +94,7 @@ def collect_all():
   all_games = []
 
   # loop through every season and every week and collect all the games
-  for season in range(2002, 2025):
+  for season in range(2002, 2027):
     print(f"fetching {season}...")
     for week in range(1, 19):
       events = fetch_games(season, week)
@@ -77,8 +105,8 @@ def collect_all():
       time.sleep(0.2)  # small pause so we dont get rate limited by ESPN
 
   df = pd.DataFrame(all_games)
-  df.to_csv("games.csv", index=False)
-  print(f"done — {len(df)} games saved to games.csv")
+  df.to_csv("games_2003_2026.csv", index=False)
+  print(f"done — {len(df)} games saved to games_2015_2026.csv")
 
 
 collect_all()
