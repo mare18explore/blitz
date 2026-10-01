@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import '../styles/Player.css'
+// base url for our flask backend, the chat goes through it now so the gemini key stays off the frontend
+const API_BASE = import.meta.env.VITE_API_URL || ''
 
 // which stat categories to show per position — filters out irrelevant stats
 // spent way too long figuring out ESPN returns everything for everyone
@@ -123,58 +125,51 @@ function Player() {
 
 	async function sendMessage() {
 		if (!input.trim() || chatLoading) return
-
+		const question = input.trim()
 		// build a context string with everything we know about this player
-		// this gets sent to Gemini so it can answer accurately
+		// this goes to our flask backend, which adds the instructions and asks gemini
 		const playerContext = `
-			You are a knowledgeable NFL analyst assistant. You have access to the following player's data:
 			Name: ${name}
-			Position: ${position}
-			Age: ${age}
-			Height: ${height}
-			Weight: ${weight}
-			Experience: ${experience} years
-			College: ${college}
-			Career Stats by Season:
-			${careerStats.map(s => {
-				const statMap = {}
-				s.categories?.forEach(cat => cat.stats?.forEach(stat => {
-          // issue with context sent to gemini, checks to make sure gemini has the correct passing stats
-        if (!statMap[stat.abbreviation]) {
-					statMap[stat.abbreviation] = stat.displayValue
-        }
+Position: ${position}
+Age: ${age}
+Height: ${height}
+Weight: ${weight}
+Experience: ${experience} years
+College: ${college}
+Career Stats by Season:
+${careerStats.map(s => {
+	const statMap = {}
+	s.categories?.forEach(cat => cat.stats?.forEach(stat => {
+		// first value wins so passing stats don't get overwritten by rushing for QBs
+		if (!statMap[stat.abbreviation]) {
+			statMap[stat.abbreviation] = stat.displayValue
+		}
+	}))
+	return `${s.year}: ${Object.entries(statMap).map(([k, v]) => `${k}: ${v}`).join(', ')}`
+}).join('\n')}
+`.trim()
 
-				}))
-				return `${s.year}: ${Object.entries(statMap).map(([k, v]) => `${k}: ${v}`).join(', ')}`
-			}).join('\n')}
-
-			Answer questions about this player clearly and conversationally. You can compare them to other players from your training knowledge. Keep answers concise — 2-4 sentences unless more detail is asked for.
-		`
-
-		const userMessage = { role: 'user', content: input }
-		const updatedMessages = [...messages, userMessage]
-		setMessages(updatedMessages)
+		// show the user's message right away instead of waiting on the reply
+		setMessages(prev => [...prev, { role: 'user', content: question }])
 		setInput('')
 		setChatLoading(true)
 
 		try {
-			const response = await fetch(
-        `/api/gemini/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [
-              { role: 'user', parts: [{ text: playerContext + '\n\nUser: ' + input }] }
-            ]
-          })
-        }
-      )
-
+			// send the question and player data to flask, it handles the gemini call on the server
+			const response = await fetch(`${API_BASE}/chat`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ question, context: playerContext }),
+			})
 			const data = await response.json()
-			const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I could not generate a response.'
+
+			// flask sends back an error message if something failed, so show that instead of a blank reply
+			const reply = response.ok
+				? data.answer
+				: (data.error || 'Sorry, I could not generate a response.')
 			setMessages(prev => [...prev, { role: 'assistant', content: reply }])
 		} catch (err) {
+			// network error or the backend is down
 			setMessages(prev => [...prev, { role: 'assistant', content: 'Something went wrong. Try again.' }])
 		} finally {
 			setChatLoading(false)
@@ -304,7 +299,7 @@ function Player() {
 				</div>
 			)}
 
-			{/* AI chat — passes player bio + career stats as context so Gemini can answer accurately */}
+			{/* AI chat, sends the player's bio and career stats to our backend so the answers use real data */}
 			<div className="player-chat">
 				<p className="section-label">Ask about {name}</p>
 

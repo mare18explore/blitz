@@ -6,3 +6,5 @@ pandas
 psycopg2-binary
 requests
 pytest
+google-genai
+python-dotenv

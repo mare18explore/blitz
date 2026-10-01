@@ -4,9 +4,15 @@ import pickle, os
 import numpy as np
 import psycopg2 
 import requests
+from google import genai
+from google.genai import types
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 CORS(app)  # allows our React app to call this API without CORS errors
+
+# loads DATABASE_URL and GEMINI_API_KEY from .env when running locally, railway sets them in production
+load_dotenv()
 
 # postgres connection string from the environment, points at AWS RDS.
 DATABASE_URL = os.environ.get("DATABASE_URL")
@@ -172,6 +178,75 @@ def predict():
     "home_win_prob": home_prob,
     "away_win_prob": away_prob,
   })
+
+# gemini client lives on the backend so the api key never ends up in the browser
+gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+
+def retrieve_chunks(question, k=5):
+    # turn the question into an embedding and grab the closest team seasons from pgvector
+    # questions use RETRIEVAL_QUERY, the stored chunks were embedded with RETRIEVAL_DOCUMENT
+    result = gemini_client.models.embed_content(
+        model="gemini-embedding-001",
+        contents=[question],
+        config=types.EmbedContentConfig(output_dimensionality=768, task_type="RETRIEVAL_QUERY"),
+    )
+    vec = "[" + ",".join(str(x) for x in result.embeddings[0].values) + "]"
+
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        # <=> is cosine distance, smallest first means most relevant first
+        cur.execute(
+            "SELECT content FROM nfl_chunks ORDER BY embedding <=> %s::vector LIMIT %s",
+            (vec, k),
+        )
+        return [row[0] for row in cur.fetchall()]
+    finally:
+        conn.close()  # always close the connection, even if the query fails
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    data = request.get_json(silent=True) or {}
+    question = (data.get("question") or "").strip()
+    context = data.get("context") or ""
+
+    # basic checks so nobody can send empty or huge requests and burn through our gemini quota
+    if not question:
+        return jsonify({"error": "question is required"}), 400
+    if len(question) > 500:
+        return jsonify({"error": "question is too long"}), 400
+    if len(context) > 20000:
+        return jsonify({"error": "context is too large"}), 400
+
+    # pull relevant team seasons from the database, if this fails the chat still works with just the player stats
+    try:
+        league_facts = retrieve_chunks(question)
+    except Exception as e:
+        print(f"retrieval error: {e}")
+        league_facts = []
+    league_text = "\n".join(league_facts) if league_facts else "None found."
+
+     # player stats come from the frontend, league data comes from our pgvector search, plain text stops markdown asterisks
+    prompt = (
+        "You are a knowledgeable NFL analyst assistant. Use the player data and league data below to answer accurately. "
+        "You can compare the player to others from your general knowledge, but the data provided takes priority. "
+        "Keep answers concise, 2 to 4 sentences unless more detail is asked for. "
+        "Write in plain text without markdown formatting.\n\n"
+        f"Player data:\n{context}\n\n"
+        f"League data (team season summaries):\n{league_text}\n\n"
+        f"Question: {question}"
+    )
+
+    try:
+        response = gemini_client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
+        return jsonify({"answer": response.text})
+    except Exception as e:
+        # log the real error for us, but only send a generic message back to the browser
+        print(f"gemini error: {e}")
+        return jsonify({"error": "the AI service failed, try again"}), 502
 
 @app.route("/scoreboard", methods=["GET"])
 def get_scoreboard():

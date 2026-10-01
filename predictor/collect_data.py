@@ -109,4 +109,6 @@ def collect_all():
   print(f"done — {len(df)} games saved to games_2015_2026.csv")
 
 
-collect_all()
+# only run the full collection when this file is run directly, not when another script imports from it
+if __name__ == "__main__":
+    collect_all()
