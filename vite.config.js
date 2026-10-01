@@ -15,11 +15,6 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/espn/, '')
       },
-      '/api/gemini': {
-        target: 'https://generativelanguage.googleapis.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/gemini/, '')
-      },
       '/api/predictor': {
           target: 'http://localhost:5001',
           changeOrigin: true,

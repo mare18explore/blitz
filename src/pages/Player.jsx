@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import '../styles/Player.css'
-// base url for our flask backend, the chat goes through it now so the gemini key stays off the frontend
-const API_BASE = import.meta.env.VITE_API_URL || ''
+// same proxy the rest of the app uses, vite forwards it locally and vercel forwards it to railway in production
+const API_BASE = '/api/predictor'
 
 // which stat categories to show per position — filters out irrelevant stats
 // spent way too long figuring out ESPN returns everything for everyone

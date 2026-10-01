@@ -13,11 +13,6 @@
     {
       "source": "/api/predictor/:path*",
       "destination": "https://blitz-production-8b3e.up.railway.app/:path*"
-    },
-
-    {
-      "source": "/api/gemini/:path*",
-      "destination": "https://generativelanguage.googleapis.com/:path*"
     }
   ],
   "headers": [
