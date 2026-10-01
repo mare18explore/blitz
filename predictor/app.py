@@ -179,8 +179,9 @@ def predict():
     "away_win_prob": away_prob,
   })
 
-# gemini client lives on the backend so the api key never ends up in the browser
-gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+# only create the gemini client if we have a key, so a missing key breaks the chat instead of the whole app
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+gemini_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
 def retrieve_chunks(question, k=5):
     # turn the question into an embedding and grab the closest team seasons from pgvector
@@ -206,6 +207,8 @@ def retrieve_chunks(question, k=5):
 
 @app.route("/chat", methods=["POST"])
 def chat():
+    if gemini_client is None:
+      return jsonify({"error": "the chat isn't configured right now, try again later"}), 503
     data = request.get_json(silent=True) or {}
     question = (data.get("question") or "").strip()
     context = data.get("context") or ""
